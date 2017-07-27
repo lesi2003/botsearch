@@ -1,0 +1,72 @@
+<html>
+<head>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" type="text/javascript"></script>
+	<script src="https://webchat-v3r2sandbox.pype.tech/webchat-public.js"></script>
+	<script type="text/javascript">
+
+
+$(document).ready(function(){
+
+
+$(function () {
+    $('#search-term').submit(function(event){
+      event.preventDefault();
+      var searchTerm = $('#query').val();
+      getRequest(searchTerm);
+    }); 
+});
+
+function getRequest(searchTerm){
+	console.log("REQUEST")
+    var params = {
+        keyword: searchTerm,
+//      r: 'json'
+    };
+    url = 'https://botchat-id.herokuapp.com/lookup_bot';
+
+    $.getJSON( url, params )
+	  .done(function( data ) {
+	    showResult(data);
+	  })
+	  .fail(function( jqxhr, textStatus, error ) {
+	    var err = textStatus + ", " + error;
+	    console.log( "Request Failed: " + err );
+	    if (error == 'NOT FOUND') {
+	    	noResult(searchTerm);
+	    }
+	});
+}
+
+function showResult (value) {
+	console.log(value)
+    var html = "";
+    html += '<p>Bot_app is: <b>' + value.app_name + '</b></p>';
+    $('#search-results').html(html);
+    
+    Pypestream('config', {
+    domain: 'dev',
+    env: 'sandbox',
+  })
+
+  Pypestream('boot', {
+    APP_ID: value.app_id,
+  }, document.getElementById('container'))
+}
+function noResult (searchTerm) {
+    var html = "";
+    html += '<p>Bot_app not found for: ' + searchTerm + '</p>';
+    $('#search-results').html(html);
+}
+});
+	</script>
+</head>
+<body>
+<form id="search-term">
+    <input type="text" name="input" id="query" placeholder="Enter keyword search here" />
+    <label for="input"><input type="submit" class="submit" value="Submit" /></label>
+</form>
+<div id="search-results"> </div>
+<button onClick="Pypestream('shutdown')">Shutdown</button>
+<div id="container"></div>
+</body>
+</html>
