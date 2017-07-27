@@ -51,6 +51,7 @@ function showResult (value) {
 
   Pypestream('boot', {
     APP_ID: value.app_id,
+    allowToggle: false,
   }, document.getElementById('container'))
 }
 function noResult (searchTerm) {
